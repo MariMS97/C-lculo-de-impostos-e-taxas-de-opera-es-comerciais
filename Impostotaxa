@@ -1,0 +1,87 @@
+public class Impostotaxa {
+    public static void main(String[] args) {
+        //Criar um produto
+        Produto produto = new Produto();
+        produto.descricao = "Tablet";
+        produto.custo = 3500.0;
+
+        //Criar um serviço
+        Servico servico = new Servico();
+        servico.descricao = "Troca da tela do tablet";
+        servico.custo = 1500.0;
+
+        // Criar uma operação comercial com o produto
+        OperacaoComercial operacaoProduto = new OperacaoComercial(produto);
+        operacaoProduto.calcularValorTotal();
+
+        // Criar uma operação comercial com o servico
+        OperacaoComercial operacaoServico = new OperacaoComercial(servico);
+        operacaoServico.calcularValorTotal();
+
+        // Imprimir os resultados
+        System.out.println(operacaoProduto);
+        System.out.println(operacaoServico);
+    }
+}
+
+class OperacaoComercial {
+    Item item;
+    double valorTotal;
+
+    public OperacaoComercial(Item item) {
+        this.item = item;
+    }
+
+    public void calcularValorTotal() {
+        double valorImpostos = 0;
+        valorImpostos += new ISS().calcularImposto(item.custo);
+        valorImpostos += new ICMS().calcularImposto(item.custo);
+        if (item instanceof Produto) {
+            valorImpostos += new IPI().calcularImposto(item.custo);
+        }
+        valorTotal = item.custo + valorImpostos;
+    }
+
+    @Override
+    public String toString() {
+        return "Item: " + item.descricao + "\n" +
+                "Custo: R$" + String.format("%.2f", item.custo) + "\n" +
+                "Impostos: R$" + String.format("%.2f", valorTotal - item.custo) + "\n" +
+                "Valor Total: R$" + String.format("%.2f", valorTotal);
+    }
+}
+
+abstract class Imposto {
+    double alquota;
+
+    public double calcularImposto(double valor) {
+        return valor * alquota;
+    }
+}
+
+class ISS extends Imposto {
+    public ISS() {
+        alquota = 0.073;
+    }
+}
+
+class ICMS extends Imposto {
+    public ICMS() {
+        alquota = 0.132;
+    }
+}
+
+class IPI extends Imposto {
+    public IPI() {
+        alquota = 0.219;
+    }
+}
+class Item {
+    String descricao;
+    double custo;
+}
+
+class Produto extends Item {
+}
+class Servico extends Item{
+}
